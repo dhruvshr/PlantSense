@@ -167,5 +167,5 @@ data/
 .vscode/
 
 # ruf
-todo/ruf.ipynb
+notebooks/ruf.ipynb
 
