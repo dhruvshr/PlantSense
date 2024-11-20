@@ -162,5 +162,10 @@ cython_debug/
 #.idea/
 
 
-########### local settings ###########
+# local development environment
 data/
+.vscode/
+
+# ruf
+todo/ruf.ipynb
+
