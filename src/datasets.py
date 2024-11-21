@@ -45,15 +45,8 @@ class Dataset(ABC):
         """
         pass
 
-    
-
-    
-    
-
-
-
-    
-        
-
-
-    
+    def get_data() -> :
+        """
+        Returns the dataset in a dataframe.
+        """
+        pass
