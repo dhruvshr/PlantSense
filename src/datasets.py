@@ -45,8 +45,40 @@ class Dataset(ABC):
         """
         pass
 
-    def get_data() -> :
+    def get_df() -> pd.DataFrame:
         """
-        Returns the dataset in a dataframe.
+        Returns the dataset in a pandas dataframe.
         """
         pass
+    
+    def get_feature_names() -> List[str]:
+        """
+        Returns the feature names.
+        """
+        pass
+
+    def get_class_names() -> List[str]:
+        """
+        Returns the class names.
+        """
+        pass
+
+    # def num_instances() -> int:
+    #     """
+    #     Returns the number of instances in the dataset.
+    #     """
+    #     pass
+
+    # def num_classes() -> int:
+    #     """
+    #     Returns the number of classes in the dataset.
+    #     """
+    #     pass
+
+    # def num_features() -> int:
+    #     """
+    #     Returns the number of features in the dataset.
+    #     """
+    #     pass
+
+
