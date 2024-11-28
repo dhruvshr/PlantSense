@@ -163,7 +163,6 @@ cython_debug/
 
 
 # local development environment
-data/
 .vscode/
 
 # ruf
