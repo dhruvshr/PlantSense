@@ -17,4 +17,6 @@ data/zips/
 # models
 models/checkpoints/
 
+# DS_Store
+.DS_Store
 
