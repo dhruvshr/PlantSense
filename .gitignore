@@ -1,0 +1,20 @@
+# venv
+.venv/
+
+# vscode
+.vscode/
+
+# pycache
+__pycache__/
+
+# environment variables
+.env
+
+# datasets (raw, zipped)
+data/raw/
+data/zips/
+
+# models
+models/checkpoints/
+
+
