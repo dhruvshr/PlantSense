@@ -7,8 +7,6 @@ import cv2
 from matplotlib import pyplot as plt
 import os
 
-
-
 class DatasetInterface(ABC):
     """
     Abstract base class for datasets. This interface handles loading and processing
@@ -22,7 +20,7 @@ class DatasetInterface(ABC):
         get_data(): Helper method to retrieve the data and labels.
     """
 
-    def __init__(self, name: str, path: str):
+    def __init__(self, name: str, path: str, augmented: bool):
         """
         Initialize the dataset interface with the path to the dataset.
 
@@ -33,10 +31,11 @@ class DatasetInterface(ABC):
         self.path = path
         self.data = None    
         self.labels = None
-        self.classes = os.listdir(path)
+        self.classes = None
+        self.augmented = augmented
     
     @abstractmethod
-    def load_data(self):
+    def load_data(self, batch_size: int = 32, shuffle: bool = True):
         """
         Load data from the dataset (e.g., read images from disk, load CSV).
         The data and labels will be stored in `self.data` and `self.labels`.
@@ -51,7 +50,7 @@ class DatasetInterface(ABC):
         pass
 
     @abstractmethod
-    def classes_to_idx(self) -> dict[str, int]:
+    def get_classes_idx(self) -> dict[str, int]:
         """
         Convert class labels to class indices.
         """
