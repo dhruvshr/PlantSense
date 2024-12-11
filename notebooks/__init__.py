@@ -1,0 +1,3 @@
+"""
+ruf notebooks module
+"""

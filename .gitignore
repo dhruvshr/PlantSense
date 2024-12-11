@@ -10,12 +10,14 @@ __pycache__/
 # environment variables
 .env
 
+# egg
+plantsense.egg-info/
 # datasets (raw, zipped)
 data/raw/
 data/zips/
 
 # models
-models/
+model_files/
 
 # DS_Store
 .DS_Store
