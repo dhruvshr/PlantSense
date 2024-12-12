@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader
 
 from torch.utils.data import Dataset, random_split
 from torchvision import transforms, datasets
+from src.utils.transforms import default_transform
 
 PLANTVILLAGE_PATH = "data/raw/Plant_leave_diseases_dataset_with_augmentation"
 
@@ -28,23 +29,7 @@ class PlantVillage(Dataset):
         """
         Default data augmentation and preprocessing transforms
         """
-        return transforms.Compose([
-            # convert to tensor and normalize using ImageNet stats
-            transforms.ToTensor(),
-            transforms.Normalize(
-                mean=[0.485, 0.456, 0.406],
-                std=[0.229, 0.224, 0.225]
-            ),
-            # resize images to consistent size
-            transforms.Resize((224, 224)),
-
-            # random augmentations for training
-            transforms.RandomHorizontalFlip(p=0.5),
-            transforms.RandomVerticalFlip(p=0.5),
-            transforms.RandomRotation(degrees=30),
-            transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
-            transforms.RandomResizedCrop(224, scale=(0.8, 1.0))
-        ])
+        return default_transform()
     
     def __len__(self):
         return len(self.plantvillage)

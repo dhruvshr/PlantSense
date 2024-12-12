@@ -12,12 +12,15 @@ from src.utils.save_model import save_trained_model
 from src.datasets.plant_village import PlantVillage
 from src.training.trainer import ModelTrainer
 from src.model.plantsense_resnet import PlantSenseResNetBase
+from src.utils.save_model import save_checkpoint
 
 # def
 BATCH_SIZE = 32
 NUM_WORKERS = 2
 LEARNING_RATE = 0.001
 NUM_EPOCHS = 10
+CHECKPOINTS_SAVE_DIR = 'model_files/checkpoints'
+VERSION = 1_2
 
 def train():
     # device configuration
@@ -70,6 +73,8 @@ def train():
 
     print(f"Training {model.__class__.__name__} on {device}\n")
 
+    accuracies = list()
+
     # training loop
     num_epochs = NUM_EPOCHS
     for epoch in range(num_epochs):
@@ -79,6 +84,21 @@ def train():
         print(f"Epoch {epoch+1}/{num_epochs}")
         print(f"Train Loss: {train_metrics['loss']:.4f}, Accuracy: {train_metrics['accuracy']:.2f}%")
         print(f"Val Loss: {val_metrics['loss']:.4f}, Accuracy: {val_metrics['accuracy']:.2f}%")
+
+        checkpoint_save = input("Save Checkpoint?: y or n: ")
+
+        if (checkpoint_save.strip() == 'y'):
+            save_checkpoint(
+                model, 
+                optimizer, 
+                CHECKPOINTS_SAVE_DIR, 
+                model.__class__.__name__, 
+                VERSION, 
+                epoch=epoch
+            )
+            pass
+        elif (checkpoint_save.strip() == 'n'):
+            pass
 
 if __name__ == '__main__':
     train()

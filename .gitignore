@@ -23,3 +23,6 @@ model_files/
 # DS_Store
 .DS_Store/
 
+# file structure
+file_structure.md
+
