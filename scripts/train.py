@@ -8,6 +8,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 from src.utils.device import get_device
+from src.utils.save_model import save_trained_model
 from src.datasets.plant_village import PlantVillage
 from src.training.trainer import ModelTrainer
 from src.model.plantsense_resnet import PlantSenseResNetBase
@@ -67,7 +68,7 @@ def train():
         optimizer = optimizer
     )
 
-    print(f"Training {model.__class__.__name__} on {device}")
+    print(f"Training {model.__class__.__name__} on {device}\n")
 
     # training loop
     num_epochs = NUM_EPOCHS
@@ -79,9 +80,9 @@ def train():
         print(f"Train Loss: {train_metrics['loss']:.4f}, Accuracy: {train_metrics['accuracy']:.2f}%")
         print(f"Val Loss: {val_metrics['loss']:.4f}, Accuracy: {val_metrics['accuracy']:.2f}%")
 
-
 if __name__ == '__main__':
     train()
+    
 
 
 

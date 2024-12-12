@@ -12,6 +12,7 @@ __pycache__/
 
 # egg
 plantsense.egg-info/
+
 # datasets (raw, zipped)
 data/raw/
 data/zips/
