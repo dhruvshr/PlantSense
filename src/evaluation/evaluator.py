@@ -67,10 +67,13 @@ class ModelEvaluator:
 
                     tepoch.set_postfix(loss=test_loss / total, accuracy=100 * correct / total)
         
-        # Compute detailed metrics
+        # compute detailed metrics
         accuracy = 100 * correct / total
         precision, recall, f1, _ = precision_recall_fscore_support(
-            self.all_labels, self.all_preds, average='weighted'
+            self.all_labels, 
+            self.all_preds, 
+            average='weighted',
+            zero_division=0
         )
         
         return {

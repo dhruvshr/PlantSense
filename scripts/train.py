@@ -1,25 +1,30 @@
 """
 ML Model Train script
 """
-
+import os
 import torch.nn as nn
 import torch.optim as optim
 
 from torch.utils.data import DataLoader
+
+from dotenv import load_dotenv
 
 from src.utils.device import get_device
 from src.utils.save_model import save_trained_model
 from src.datasets.plant_village import PlantVillage
 from src.training.trainer import ModelTrainer
 from src.model.plantsense_resnet import PlantSenseResNetBase
-from src.utils.save_model import save_checkpoint
+from src.utils.save_model import save_checkpoint, save_model
+
+load_dotenv()
 
 # def
 BATCH_SIZE = 32
 NUM_WORKERS = 2
 LEARNING_RATE = 0.001
 NUM_EPOCHS = 10
-CHECKPOINTS_SAVE_DIR = 'model_files/checkpoints'
+CHECKPOINTS_SAVE_DIR = 'saved_models/checkpoints'
+MODEL_SAVE_DIR = 'saved_models'
 VERSION = 1_2
 
 def train():
@@ -56,7 +61,7 @@ def train():
 
     # init model
     model = PlantSenseResNetBase(
-        num_classes=len(base_dataset.plantvillage.classes),
+        num_classes=base_dataset.NUM_CLASSES,
     ).to(device)
 
     # setup training components
@@ -100,8 +105,23 @@ def train():
         elif (checkpoint_save.strip() == 'n'):
             pass
 
+    # save model
+    model_save = input("Save Model?: y or n: ")
+
+    if (model_save.strip() == 'y'):
+        save_model(
+            model, 
+            MODEL_SAVE_DIR, 
+            model.__class__.__name__, 
+            VERSION
+        )
+        pass
+    elif (model_save.strip() == 'n'):
+        pass
+
 if __name__ == '__main__':
     train()
+    
     
 
 

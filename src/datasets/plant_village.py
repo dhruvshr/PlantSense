@@ -24,6 +24,7 @@ class PlantVillage(Dataset):
         self.transform = transform or self._default_transforms()
 
         self.plantvillage = datasets.ImageFolder(self.dataset, transform=self.transform)
+        self.NUM_CLASSES = len(self.plantvillage.classes)
 
     def _default_transforms(self):
         """
@@ -85,10 +86,10 @@ if __name__ == "__main__":
     for cls in classes:
         print(cls)
 
-    # Create DataLoader for both
-    train_loader = DataLoader(train, batch_size=32, shuffle=True, num_workers=4)
-    val_loader = DataLoader(val, batch_size=32, shuffle=False, num_workers=4)
+    # # Create DataLoader for both
+    # train_loader = DataLoader(train, batch_size=32, shuffle=True, num_workers=4)
+    # val_loader = DataLoader(val, batch_size=32, shuffle=False, num_workers=4)
 
-    # Loop through the DataLoader
-    for images, labels in train_loader:
-        print(images.size(), labels)
+    # # Loop through the DataLoader
+    # for images, labels in train_loader:
+    #     print(images.size(), labels)

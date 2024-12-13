@@ -18,11 +18,14 @@ data/raw/
 data/zips/
 
 # models
-model_files/
+saved_models/
 
 # DS_Store
 .DS_Store/
 
 # file structure
 file_structure.md
+
+# flask configs
+app/main/config.py
 

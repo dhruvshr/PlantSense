@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlantSense</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: 50px auto;
+            max-width: 600px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+        }
+        .results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to PlantSense!</h1>
+        <p>Upload an image of your plant to detect diseases and receive actionable insights.</p>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="image" accept="image/*" required>
+            <br><br>
+            <button type="submit">Upload Image</button>
+        </form>
+
+        {% if uploaded_image_path %}
+            <div class="results">
+                <h2>Results</h2>
+                <img src="{{ uploaded_image_path }}" alt="Uploaded Image">
+                <p><strong>Disease:</strong> {{ disease }}</p>
+                <p><strong>Confidence:</strong> {{ confidence }}%</p>
+                <h3>Insights</h3>
+                <p>{{ insights }}</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

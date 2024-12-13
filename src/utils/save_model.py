@@ -35,7 +35,7 @@ def save_model(model, save_dir, model_name, version):
 
 def save_checkpoint(model, optimizer, save_dir, model_name, version, epoch=None):
     """Saves the model checkpoint (model state_dict and optimizer state_dict) with versioning."""
-    save_path = os.path.join(f"{save_dir}checkpoints/", f"{model_name}_v{version}_checkpoint.pth")
+    save_path = os.path.join(f"{save_dir}", f"{model_name}_v{version}_checkpoint.pth")
     checkpoint = {
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),

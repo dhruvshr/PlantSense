@@ -10,13 +10,14 @@ from src.datasets.plant_village import PlantVillage
 from src.model.plantsense_resnet import PlantSenseResNetBase
 from src.evaluation.evaluator import ModelEvaluator
 from src.llm.insights_engine import InsightsEngine
+from src.utils.device import get_device
 
 # def
 BATCH_SIZE = 32
 NUM_WORKERS = 2
 LEARNING_RATE = 0.001
 NUM_EPOCHS = 10
-MODEL_V1_1_PATH = 'model_files/modelv1_1.pth'
+MODEL_V1_1_PATH = 'saved_models/modelv1_1.pth'
 
 def infer_image(image_path, model, device, base_dataset):
     # load image
@@ -42,10 +43,10 @@ def infer_image(image_path, model, device, base_dataset):
 
     return predicted_class, confidence_score
 
-def load_model(device, base_dataset):
+def load_model(device):
     # load model (modify as per training script)
     model = PlantSenseResNetBase(
-        num_classes=len(base_dataset.plantvillage.classes),
+        num_classes=PlantVillage().NUM_CLASSES,
     ).to(device)
 
     # Load the state dict and modify the keys to match your model structure
@@ -61,11 +62,11 @@ def load_model(device, base_dataset):
 
 def main():
     # Device configuration
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = get_device()
 
     base_dataset = PlantVillage()
     # Load the trained model
-    model = load_model(device, base_dataset)
+    model = load_model(device)
 
     # Initialize the evaluator
     # evaluator = ModelEvaluator(
@@ -98,10 +99,10 @@ def main():
 
                 predicted_class, confidence_score = infer_image(image_path, model, device, base_dataset)
                 # Create prediction dictionary with both class and confidence
-                prediction = [{'class': predicted_class, 'confidence': confidence_score}]  # Adding mock confidence for now
-                insights = insights_engine.generate_insights(prediction, [image_path])  # Wrap in lists
+                # prediction = [{'class': predicted_class, 'confidence': confidence_score}]  # Adding mock confidence for now
+                insights = insights_engine.generate_insights(predicted_class, confidence_score)  # Wrap in lists
                 print(f"The plant disease detected is: {predicted_class}")
-                print(f"Actionable insights: {insights}")
+                print(f"PlantSense: {insights}")
 
                 user_feedback = input("Do you have any questions or comments about the results? (Enter 'yes' or 'no'): ")
                 if user_feedback.lower() == 'yes':
