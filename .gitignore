@@ -28,3 +28,6 @@ file_structure.md
 
 # flask configs
 app/main/config.py
+
+# python db
+instance/

@@ -3,7 +3,6 @@ LLM Insights Engine
 """
 
 import os
-from typing import List, Dict
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -48,36 +47,37 @@ class InsightsEngine:
         Returns:
             str: Constructed prompt
         """
-        print(predicted_class)
-        print(confidence)
+        # print(predicted_class)
+        # print(confidence)
         prompt = BASE_PROMPT
 
-        if "healthy" in predicted_class:
-                prompt += f"""
-                1. Share the good news about the plant's health in a friendly tone.
-                2. Offer general plant care advice to keep the plant thriving.
-                3. Consider your language and tone with a degree of certainty depending on the confidence score {confidence:.2f}%.
-                4. Provide fun or interesting facts about plants to engage the user.
-                5. End with an open-ended question like, "Would you like tips to make your plant even happier?"
-            
-                Example starting point:
-                "Hi there! Your plant looks fantastic—healthy and happy! Keep up the great care. Here's how you can maintain this..."
-                """
+        if predicted_class:
+            if "healthy" in predicted_class:
+                    prompt += f"""
+                    1. Share the good news about the plant's health in a friendly tone.
+                    2. Offer general plant care advice to keep the plant thriving.
+                    3. Consider your language and tone with a degree of certainty depending on the confidence score {confidence:.2f}%.
+                    4. Provide fun or interesting facts about plants to engage the user.
+                    5. End with an open-ended question like, "Would you like tips to make your plant even happier?"
+                
+                    Example starting point:
+                    "Hi there! Your plant looks fantastic—healthy and happy! Keep up the great care. Here's how you can maintain this..."
+                    """
 
-        else:
-            prompt += f"""
-            You are PlantSense, an intelligent and friendly plant health assistant. A user has uploaded a picture of their plant, and you've identified signs of {predicted_class}. Your task is to:
-            
-            1. Greet the user in a friendly way and confirm the plant's condition conversationally.
-            2. Explain {predicted_class} in simple terms, including what it is and how it affects the plant.
-            3. Consider your language and tone with a degree of certainty depending on the confidence score {confidence:.2f}%.
-            4. Offer practical, step-by-step advice to manage or treat the condition.
-            5. Suggest preventive measures to avoid similar issues in the future.
-            6. End with an open-ended question like, "Is there anything else you'd like help with?"
-            
-            Example starting point:
-            "Hi there! Based on your plant's condition, it seems to have {str(predicted_class).replace('_', ' ')}. Don't worry—I'm here to help! Here's what you need to know..."
-            """
+            else:
+                prompt += f"""
+                You are PlantSense, an intelligent and friendly plant health assistant. A user has uploaded a picture of their plant, and you've identified signs of {predicted_class}. Your task is to:
+                
+                1. Greet the user in a friendly way and confirm the plant's condition conversationally.
+                2. Explain {predicted_class} in simple terms, including what it is and how it affects the plant.
+                3. Consider your language and tone with a degree of certainty depending on the confidence score {confidence:.2f}%.
+                4. Offer practical, step-by-step advice to manage or treat the condition.
+                5. Suggest preventive measures to avoid similar issues in the future.
+                6. End with an open-ended question like, "Is there anything else you'd like help with?"
+                
+                Example starting point:
+                "Hi there! Based on your plant's condition, it seems to have {str(predicted_class).replace('_', ' ')}. Don't worry—I'm here to help! Here's what you need to know..."
+                """
 
         if user_feedback:
              prompt = f"""

@@ -34,6 +34,24 @@
             height: auto;
             margin-top: 20px;
         }
+        .chat-log {
+            background-color: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+        .chat-log p {
+            margin: 10px 0;
+        }
+        .user-message {
+            color: #4CAF50;
+        }
+        .bot-message {
+            color: #fff;
+        }
         .results {
             margin-top: 20px;
         }
@@ -43,22 +61,39 @@
     <div class="container">
         <h1>Welcome to PlantSense!</h1>
         <p>Please upload an image of your plant, and I'll analyze it and provide insights.</p>
+
+        <!-- upload form -->
         <form method="POST" enctype="multipart/form-data">
             <input type="file" name="image" accept="image/*" required>
             <br><br>
             <button type="submit">Upload Image</button>
         </form>
 
+        <!-- display image -->
         {% if uploaded_image_path %}
             <div class="results">
                 <h2>Results</h2>
-                <img src="{{ uploaded_image_path }}" alt="Uploaded Image">
-                <p><strong>Disease:</strong> {{ disease }}</p>
-                <p><strong>Confidence:</strong> {{ confidence }}%</p>
-                <h3>Insights</h3>
-                <p>{{ insights }}</p>
+                <img src="{{ url_for('static', filename='uploaded_images/' + uploaded_image_path.split('/')[-1]) }}" alt="Uploaded Image">
             </div>
         {% endif %}
+
+        <!-- chat log -->
+        {% if insights %}
+            <div class="chat-log">
+                <h3>PlantSense Insights</h3>
+                {% for insight in insights %}
+                    <p class="{% if loop.index % 2 == 0 %}bot-message{% else %}user-message{% endif %}">
+                        {{ insight }}
+                    </p>
+                {% endfor %}
+            </div>
+
+            <!-- feedback form -->
+            <form method="POST">
+                <input type="text" name="user_feedback" placeholder="Any Questions?" required>
+                <button type="submit">Send</button>
+            </form>
+         {% endif %}
     </div>
 </body>
 </html>

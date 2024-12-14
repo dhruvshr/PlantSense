@@ -2,7 +2,6 @@
 Flask Initialization
 """
 import os
-import torch
 from dotenv import load_dotenv
 from flask import Flask
 from torch.serialization import add_safe_globals
