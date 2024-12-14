@@ -20,6 +20,14 @@ You are PlantSense, an expert in plant health and care. A user has uploaded a pi
 Be empathetic, helpful, and engaging in your responses.
 """
 
+FEEDBACK_PROMPT = """
+1. You have detected the disease.
+2. The user has asked some follow up questions and/or concerns. Or the user as answered your follow-up question, indicating that they want to know more.
+3. Respond to their question with additional information and/or clarifying information.
+4. Avoid mentioning technical details like "confidence scores" or "model predictions."
+Be empathetic, helpful, and engaging in your responses.
+"""
+
 class InsightsEngine:
     """
     A class to generate conversational insights from model predictions using LLM
@@ -29,21 +37,23 @@ class InsightsEngine:
         load_dotenv()
         self.client = OpenAI(api_key=os.getenv('OPENAI_GPT_API_KEY'))
 
-    def _generate_prompt(self, predicted_class, confidence):
+    def _generate_prompt(self, predicted_class, confidence, user_feedback=None):
         """
         Generate a prompt for the LLM based on predictions
         
         Args:
             predicted_class (str): Predicted class label
             confidence (float): Confidence score of the prediction
-            
+            user_feedback (str, optional): user's follow up question
         Returns:
             str: Constructed prompt
         """
+        print(predicted_class)
+        print(confidence)
         prompt = BASE_PROMPT
-        if "healthy" in predicted_class.lower():
+
+        if "healthy" in predicted_class:
                 prompt += f"""
-                {BASE_PROMPT} + 
                 1. Share the good news about the plant's health in a friendly tone.
                 2. Offer general plant care advice to keep the plant thriving.
                 3. Consider your language and tone with a degree of certainty depending on the confidence score {confidence:.2f}%.
@@ -69,24 +79,50 @@ class InsightsEngine:
             "Hi there! Based on your plant's condition, it seems to have {str(predicted_class).replace('_', ' ')}. Don't worry—I'm here to help! Here's what you need to know..."
             """
 
+        if user_feedback:
+             prompt = f"""
+             1. The plant has been detected with the condition '{predicted_class}'.
+             2. The confidence is {confidence:.2f}%.
+             3. User has asked the follow-up: '{user_feedback}'.
+             4. Provide additional information or clarification regarding the user's query or concern.
+             """
+
         return prompt
+         
         
-    def generate_insights(self, predicted_class, confidence) -> str:
+    def generate_insights(self, predicted_class, confidence, user_feedback=None) -> str:
         """
         Generate natural language insights from model predictions
         
         Args:
-            predictions (List[Dict]): List of prediction dictionaries containing class labels and confidence scores
-            image_paths (List[str]): List of paths to the analyzed images
+            predicted_class (str): Predicted class label (e.g., disease name).
+            confidence (float): Confidence score of the prediction.
+            user_feedback (str, optional): User-provided follow-up question or comment
             
         Returns:
             str: Natural language insights about the predictions
         """
         # Construct the prompt
-        prompt = self._generate_prompt(predicted_class, confidence)
+        prompt = self._generate_prompt(predicted_class, confidence, user_feedback)
         
+        if user_feedback:
+             try:
+                  # get completion from openai
+                response = self.client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[
+                        {"role": "system", "content": FEEDBACK_PROMPT},
+                        {"role": "user", "content": prompt}
+                    ],
+                    temperature=0.7,
+                    max_tokens=500
+                )
+                return response.choices[0].message.content
+             except Exception as e:
+                 return f"Error generating follow up insights: {str(e)}"
+
         try:
-            # Get completion from OpenAI
+            # get completion from openai
             response = self.client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[

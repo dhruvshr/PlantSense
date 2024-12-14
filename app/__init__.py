@@ -36,6 +36,7 @@ def create_app():
 
         # load model as config
         app.config['MODEL'] = load_model()
+        app.config['DEVICE'] = get_device()
 
     # load main blueprint
     from app.main import main as main_bp
