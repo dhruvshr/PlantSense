@@ -31,3 +31,6 @@ app/main/config.py
 
 # python db
 instance/
+
+# user uploaded images
+app/static/uploaded_images/

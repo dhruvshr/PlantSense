@@ -14,10 +14,12 @@
             margin: 0;
             padding: 0;
         }
+        
         .container {
             margin: 50px auto;
             max-width: 600px;
         }
+        
         button {
             background-color: #4CAF50;
             color: white;
@@ -25,15 +27,20 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
+        
         button:hover {
             background-color: #45a049;
+            transform: scale(1.05);
         }
+        
         img {
             max-width: 100%;
             height: auto;
             margin-top: 20px;
         }
+        
         .chat-log {
             background-color: #1a1a1a;
             padding: 20px;
@@ -43,17 +50,47 @@
             overflow-y: auto;
             max-height: 300px;
         }
+        
         .chat-log p {
             margin: 10px 0;
         }
+        
         .user-message {
             color: #4CAF50;
+            font-weight: bold;
         }
+        
         .bot-message {
             color: #fff;
         }
-        .results {
+        
+        .feedback-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             margin-top: 20px;
+        }
+        
+        .feedback-form input[type="text"] {
+            padding: 10px;
+            width: 80%;
+            margin-bottom: 10px;
+            border: 1px solid #4CAF50;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #000;
+        }
+        
+        .feedback-form button {
+            width: 50%;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .feedback-form input[type="text"]:focus {
+            outline: none;
+            border-color: #45a049;
+            box-shadow: 0 0 5px #4CAF50;
         }
     </style>
 </head>
@@ -78,22 +115,25 @@
         {% endif %}
 
         <!-- chat log -->
-        {% if insights %}
+        {% if conversation %}
             <div class="chat-log">
-                <h3>PlantSense Insights</h3>
-                {% for insight in insights %}
-                    <p class="{% if loop.index % 2 == 0 %}bot-message{% else %}user-message{% endif %}">
-                        {{ insight }}
+                <h4>PlantSense Chat</h4>
+                {% for message in conversation %}
+                    <p class="{% if message.sender == 'User' %}user-message{% else %}bot-message{% endif %}">
+                        {{ message.message|safe }}
                     </p>
                 {% endfor %}
             </div>
+        {% endif %}
 
-            <!-- feedback form -->
-            <form method="POST">
-                <input type="text" name="user_feedback" placeholder="Any Questions?" required>
+        <!-- feedback loop -->
+         {% if uploaded_image_path %}
+            <form method="post" class="feedback-form">
+                <input type="text" name="user_feedback" placeholder="Ask a follow-up question..." required>
                 <button type="submit">Send</button>
             </form>
          {% endif %}
+
     </div>
 </body>
 </html>
