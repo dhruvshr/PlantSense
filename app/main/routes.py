@@ -12,22 +12,23 @@ from app.db.models import UploadedImage, InferenceConversation, db
 from src.utils.inference import infer_image
 from src.llm.insights_engine import InsightsEngine
 
+UPLOADED_IMAGES_DIR = 'app/static/uploaded_images'
+
 @main.route('/', methods=['GET', 'POST'])
 def index():
-    # Retrieve the uploaded image and conversation history from the database
+    # Initialize variables
     uploaded_image = None
     conversation = []
 
-    if session.get('image_id'):
-        # Fetch the uploaded image and its related conversation
-        uploaded_image = UploadedImage.query.get(session['image_id'])
-        conversation = InferenceConversation.query.filter_by(
-            image_id=uploaded_image.id
-        ).order_by(
-            InferenceConversation.timestamp
-        ).all()
-
-        # conversation = Conversation.query.filter_by(image_id=uploaded_image.id).order_by(Conversation.timestamp).paginate(page=1, per_page=10).items
+    # Check for existing session
+    # if session.get('image_id'):
+    #     uploaded_image = UploadedImage.query.get(session['image_id'])
+    #     if uploaded_image:  # Add this check
+    #         conversation = InferenceConversation.query.filter_by(
+    #             image_id=uploaded_image.id
+    #         ).order_by(
+    #             InferenceConversation.timestamp
+    #         ).all()
 
     model = current_app.config['MODEL']
     insights_engine = InsightsEngine()
@@ -45,9 +46,8 @@ def index():
             if file:
                 try:
                     # save uploaded file
-                    upload_dir = 'app/static/uploaded_images'
-                    os.makedirs(upload_dir, exist_ok=True)
-                    uploaded_image_path = os.path.join(upload_dir, file.filename)
+                    os.makedirs(UPLOADED_IMAGES_DIR, exist_ok=True)
+                    uploaded_image_path = os.path.join(UPLOADED_IMAGES_DIR, file.filename)
                     file.save(uploaded_image_path)
                     
                     # perform image inference
@@ -68,17 +68,11 @@ def index():
                     db.session.add(new_image)
                     db.session.commit()
 
-                    print(f"\nnew image id: {new_image.id}\n")
-
                     # save image id to session
-                    if new_image.id and new_image.id:
-                        try:
-                            session['image_id'] = str(new_image.id)
-                            print(f"\nimage id saved to session: {session['image_id']}\n")
-                        except Exception as e:
-                            print(f"Error saving image id to session: {e}")
-                            flash(f"Error saving image id to session: {e}")
-                            return redirect(url_for('main.index'))
+                    session['image_id'] = str(new_image.id)
+                    uploaded_image = new_image
+
+                    print(f"\nnew image id: {new_image.id}\n")
 
                     # generating conversational insights with llm
                     initial_insights = markdown(
@@ -89,22 +83,30 @@ def index():
                     )
 
                     bot_message = InferenceConversation(
-                        image_id=uploaded_image.id,
-                        sender="Bot",
+                        image_id=session['image_id'],
+                        sender="PlantSense",
                         message=initial_insights
                     )
                     db.session.add(bot_message)
                     db.session.commit()
+
+                    # get conversation for current image
+                    conversation = InferenceConversation.query.filter_by(
+                        image_id=session['image_id']
+                    ).order_by(
+                        InferenceConversation.timestamp
+                    ).all()
                     
 
                 except Exception as e:
                     flash(f'An error occurred: {e}')
                     return redirect(request.url)
                 
-        elif 'user_feedback' in request.form:
-            # Handle user feedback for follow-up questions
-            user_feedback = request.form['user_feedback']
-            if session.get('image_id'):
+        elif 'user_feedback' in request.form and session.get('image_id'):
+            uploaded_image = UploadedImage.query.get(session['image_id'])
+            if uploaded_image:  
+                # Handle user feedback for follow-up questions
+                user_feedback = request.form['user_feedback']
                 # Save the user's message to the conversation
                 user_message = InferenceConversation(
                     image_id=session['image_id'],
@@ -132,13 +134,11 @@ def index():
                 db.session.add(bot_response)
                 db.session.commit()
 
-
-    if uploaded_image:
-        conversation = InferenceConversation.query.filter_by(
-            image_id=uploaded_image.id
-        ).order_by(
-            InferenceConversation.timestamp
-        ).all()
+                conversation = InferenceConversation.query.filter_by(
+                    image_id=session['image_id']
+                ).order_by(
+                    InferenceConversation.timestamp
+                ).all()
 
     return render_template(
         'index.html',

@@ -26,7 +26,7 @@ def create_app():
     # secret key
     app.secret_key = Config.SECRET_KEY
 
-    print(f"App secret key set: {bool(app.secret_key)}")
+    # print(f"App secret key set: {bool(app.secret_key)}")
 
     # configure database
     from app.db.models import db
