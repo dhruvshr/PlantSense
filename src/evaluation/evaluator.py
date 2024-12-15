@@ -12,9 +12,7 @@ from sklearn.metrics import (
 
 from tqdm import tqdm
 
-from src.utils.device import get_device
-from src.datasets.plant_village import PlantVillage
-from src.model.plantsense_resnet import PlantSenseResNetBase
+from src.utils.metrics import MetricsTracker
 
 class ModelEvaluator:
     def __init__(self, model, device, test_loader, class_names):
@@ -34,7 +32,9 @@ class ModelEvaluator:
 
         self.all_labels = []
         self.all_preds = []
-    
+        self.metrics = MetricsTracker(self.model)
+
+
     def compute_metrics(self):
         """
         Compute comprehensive model performance metrics
@@ -146,9 +146,3 @@ class ModelEvaluator:
                 total += labels.size(0)
         
         return 100 * top_k_correct / total
-    
-    def evaluate_and_explain(self, image):
-        """
-        Evaluate the model and provide explanations for the prediction
-        """
-        pass

@@ -14,7 +14,9 @@ from src.utils.save_model import save_trained_model
 from src.datasets.plant_village import PlantVillage
 from src.training.trainer import ModelTrainer
 from src.model.plantsense_resnet import PlantSenseResNetBase
+from src.model.atomic_resnet import ResNet
 from src.utils.save_model import save_checkpoint, save_model
+from src.utils.transforms import optimized_transform
 
 load_dotenv()
 
@@ -119,8 +121,55 @@ def train():
     elif (model_save.strip() == 'n'):
         pass
 
+
+def main():
+    # Device configuration
+    device = get_device()
+    
+    # Dataset with optimized transforms
+    train_transform = optimized_transform(is_training=True)
+    val_transform = optimized_transform(is_training=False)
+    
+    # Load dataset
+    train_dataset = PlantVillage(transform=train_transform)
+    train_data, val_data, test_data = train_dataset.split_dataset()
+    
+    # Create data loaders
+    train_loader = DataLoader(
+        train_data,
+        batch_size=32,
+        shuffle=True,
+        num_workers=4,
+        pin_memory=True
+    )
+    
+    val_loader = DataLoader(
+        val_data,
+        batch_size=32,
+        shuffle=False,
+        num_workers=4,
+        pin_memory=True
+    )
+    
+    # Initialize model
+    model = ResNet(num_classes=train_dataset.NUM_CLASSES).to(device)
+
+    # setup training components
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr = LEARNING_RATE)
+
+    # create trainer
+    trainer = ModelTrainer(
+        model = model,
+        device = device,
+        criterion = criterion,
+        optimizer = optimizer
+    )
+    
+    # train model
+    trained_model = trainer.train_model(model, train_loader, val_loader, device)
 if __name__ == '__main__':
-    train()
+    main()
     
     
 

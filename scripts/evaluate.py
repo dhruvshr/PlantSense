@@ -7,14 +7,19 @@ import torch.nn as nn
 import torch.optim as optim
 from torchvision import transforms
 from torch.utils.data import DataLoader
+import matplotlib
 import matplotlib.pyplot as plt
 from src.utils.device import get_device
 from src.datasets.plant_village import PlantVillage
 from src.evaluation.evaluator import ModelEvaluator
-from src.model.plantsense_resnet import PlantSenseResNetBase
+from src.model.atomic_resnet import ResNet
+from src.utils.metrics import MetricsTracker
 
 # define model path
-MODEL_PATH = "saved_models/modelv1_1.pth"
+MODEL_PATH = "saved_models/checkpoints/resnet_model_best_2.pth"
+
+matplotlib.use('Agg')
+
 
 def main():
     # Device configuration
@@ -44,20 +49,11 @@ def main():
         shuffle=False,
         num_workers=4
     )
-    
-    # load model (modify as per training script)
-    model = PlantSenseResNetBase(
-        num_classes=PlantVillage().NUM_CLASSES
-    ).to(device)
 
-    # load the state dict and modify the keys to match model structure
-    state_dict = torch.load(MODEL_PATH, weights_only=True)
-    new_state_dict = {}
-    for key, value in state_dict.items():
-        new_state_dict[f"base_model.{key}"] = value
-    
-    # load the modified state dict
-    model.load_state_dict(new_state_dict)
+    model = ResNet(num_classes=PlantVillage().NUM_CLASSES).to(device)
+
+    model.load_state_dict(torch.load(MODEL_PATH, weights_only=True))
+
     model.eval()
 
     # initialize evaluator
@@ -84,6 +80,9 @@ def main():
     cm_fig = evaluator.plot_confusion_matrix(normalize=True)
     cm_fig.savefig('results/confusion_matrix.png')
     plt.close(cm_fig)
+
+    # update metrics
+    # evaluator.metrics.plot_metrics(model=model, save_path='results/metrics.png')
 
 if __name__ == '__main__':
     main()
