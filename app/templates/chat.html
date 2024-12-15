@@ -88,7 +88,8 @@
 
     .feedback-form input[type="text"] {
         padding: 10px;
-        width: 40%;
+        width: 50%;
+        margin-left: 20%;
         margin-bottom: 10px;
         border: 1px solid #4CAF50;
         border-radius: 5px;
@@ -99,6 +100,7 @@
 
     .feedback-form button {
         width: 20%;
+        margin-left: 20%;
         font-size: 16px;
         font-weight: bold;
     }
@@ -128,6 +130,7 @@
             <img src="{{ url_for('static', filename='uploaded_images/' + uploaded_image.file_path.split('/')[-1]) }}"
                 alt="Uploaded Image">
             <p>Uploaded Image: {{ uploaded_image.file_path.split('/')[-1] }}</p>
+            <p>Diagnosis: {{ uploaded_image.predicted_class }}</p>
         </div>
 
         {% endif %}

@@ -10,7 +10,7 @@
         color: #fff;
         font-family: Arial, sans-serif;
         text-align: center;
-        margin: 10em;
+        margin: 5em;
     }
 
     .upload-container {
@@ -47,36 +47,37 @@
 
 {% block content %}
 <body>
-<h1>Welcome to PlantSense!</h1>
-<p>Please upload an image of your plant, and I'll analyze it and provide insights.</p>
+    <img src="{{ url_for('static', filename='assets/plantsense-logo.png') }}" alt="PlantSense Logo" style="width: 100px; height: 100px;">
+    <h1>Welcome to PlantSense!</h1>
+    <p>Please upload an image of your plant, and I'll analyze it and provide insights.</p>
 
-<div class="upload-container">
-    <form method="POST" enctype="multipart/form-data">
-        <img id="imagePreview" src="#" alt="Image Preview">
-        <input type="file" name="image" accept="image/*" required id="imageInput">
-        <br>
-        <button type="submit">Upload Image</button>
-    </form>
-</div>
+    <div class="upload-container">
+        <form method="POST" enctype="multipart/form-data">
+            <img id="imagePreview" src="#" alt="Image Preview">
+            <input type="file" name="image" accept="image/*" required id="imageInput">
+            <br>
+            <button type="submit">Upload Image</button>
+        </form>
+    </div>
 
-<script>
-    document.getElementById('imageInput').onchange = function(event) {
-        const imagePreview = document.getElementById('imagePreview');
-        const file = event.target.files[0];
-        
-        if (file) {
-            const reader = new FileReader();
+    <script>
+        document.getElementById('imageInput').onchange = function(event) {
+            const imagePreview = document.getElementById('imagePreview');
+            const file = event.target.files[0];
             
-            reader.onload = function(e) {
-                imagePreview.src = e.target.result;
-                imagePreview.style.display = 'block';
+            if (file) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                }
+                
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.style.display = 'none';
             }
-            
-            reader.readAsDataURL(file);
-        } else {
-            imagePreview.style.display = 'none';
-        }
-    };
-</script>
+        };
+    </script>
 </body>
 {% endblock %}

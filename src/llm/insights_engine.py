@@ -51,7 +51,7 @@ class InsightsEngine:
         """
         # print(predicted_class)
         # print(confidence)
-        prompt = BASE_PROMPT
+        prompt = ''
 
         if predicted_class:
             if "healthy" in str(predicted_class).lower():
