@@ -9,7 +9,6 @@ from src.utils.device import get_device
 from src.utils.inference import infer_image
 from src.utils.model_loader import load_model
 
-
 def main():
     # Device configuration
     device = get_device()

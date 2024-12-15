@@ -49,7 +49,10 @@ class UploadedImage(db.Model):
             f"predicted_class={self.predicted_class}, confidence={self.confidence}>"
         )
     
-class InferenceConversation(db.Model):
+class Message(db.Model):
+    """
+    Model for messages in the chat
+    """
     id = db.Column(
         db.Integer,
         primary_key=True

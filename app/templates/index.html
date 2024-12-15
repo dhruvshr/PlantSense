@@ -1,139 +1,90 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PlantSense</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <style>
-        body {
-            background-color: #000;
-            color: #fff;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-        
-        .container {
-            margin: 50px auto;
-            max-width: 600px;
-        }
-        
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-        
-        button:hover {
-            background-color: #45a049;
-            transform: scale(1.05);
-        }
-        
-        img {
-            max-width: 100%;
-            height: auto;
-            margin-top: 20px;
-        }
-        
-        .chat-log {
-            background-color: #1a1a1a;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            text-align: left;
-            overflow-y: auto;
-            max-height: 300px;
-        }
-        
-        .chat-log p {
-            margin: 10px 0;
-        }
-        
-        .user-message {
-            color: #4CAF50;
-            font-weight: bold;
-        }
-        
-        .bot-message {
-            color: #fff;
-        }
-        
-        .feedback-form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
-        }
-        
-        .feedback-form input[type="text"] {
-            padding: 10px;
-            width: 80%;
-            margin-bottom: 10px;
-            border: 1px solid #4CAF50;
-            border-radius: 5px;
-            font-size: 16px;
-            color: #000;
-        }
-        
-        .feedback-form button {
-            width: 50%;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        
-        .feedback-form input[type="text"]:focus {
-            outline: none;
-            border-color: #45a049;
-            box-shadow: 0 0 5px #4CAF50;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Welcome to PlantSense!</h1>
-        <p>Please upload an image of your plant, and I'll analyze it and provide insights.</p>
+{% extends "base.html" %}
 
-        <!-- upload form -->
-        <form method="POST" enctype="multipart/form-data">
-            <input type="file" name="image" accept="image/*" required>
-            <br><br>
-            <button type="submit">Upload Image</button>
-        </form>
+{% block title %}PlantSense{% endblock %}
 
-        <!-- display image -->
-        {% if uploaded_image_path %}
-            <div class="results">
-                <h2>Results</h2>
-                <img src="{{ url_for('static', filename='uploaded_images/' + uploaded_image_path.split('/')[-1]) }}" alt="Uploaded Image">
-            </div>
-        {% endif %}
+{% block extra_css %}
+<style>
+    img {
+        max-width: 100%;
+        height: auto;
+        margin-top: 20px;
+    }
 
-        <!-- chat log -->
-        {% if conversation %}
-            <div class="chat-log">
-                <h4>PlantSense Chat</h4>
-                {% for message in conversation %}
-                    <p class="{% if message.sender == 'User' %}user-message{% else %}bot-message{% endif %}">
-                        {{ message.message|safe }}
-                    </p>
-                {% endfor %}
-            </div>
-        {% endif %}
+    .chat-log {
+        background-color: #1a1a1a;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        text-align: left;
+        overflow-y: auto;
+        max-height: 300px;
+        scrollbar-width: none;
+        /* Firefox */
+        -ms-overflow-style: none;
+        /* IE and Edge */
+    }
 
-        <!-- feedback loop -->
-         {% if uploaded_image_path %}
-            <form method="post" class="feedback-form">
-                <input type="text" name="user_feedback" placeholder="Ask a follow-up question..." required>
-                <button type="submit">Send</button>
-            </form>
-         {% endif %}
+    .chat-log::-webkit-scrollbar {
+        display: none;
+        /* Chrome, Safari and Opera */
+    }
 
-    </div>
-</body>
-</html>
+    .chat-log p {
+        margin: 10px 0;
+    }
+
+    .user-message {
+        color: #4CAF50;
+        font-weight: bold;
+    }
+
+    .bot-message {
+        color: #fff;
+    }
+
+    .feedback-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .feedback-form input[type="text"] {
+        padding: 10px;
+        width: 80%;
+        margin-bottom: 10px;
+        border: 1px solid #4CAF50;
+        border-radius: 5px;
+        font-size: 16px;
+        color: #000;
+    }
+
+    .feedback-form button {
+        width: 50%;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .feedback-form input[type="text"]:focus {
+        outline: none;
+        border-color: #45a049;
+        box-shadow: 0 0 5px #4CAF50;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Welcome to PlantSense!</h1>
+<p>Please upload an image of your plant, and I'll analyze it and provide insights.</p>
+
+<!-- display image -->
+
+
+<!-- upload form -->
+<form method="POST" enctype="multipart/form-data">
+    <input type="file" name="image" accept="image/*" required>
+    <br><br>
+    <button type="submit">Upload Image</button>
+</form>
+
+{% endblock %}

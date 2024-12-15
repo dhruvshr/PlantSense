@@ -3,154 +3,126 @@ Flask App Routes
 """
 
 import os
-import numpy as np
 from markdown import markdown
 from flask import session, current_app, flash, request, render_template, redirect, url_for
 from PIL import Image
 from app.main import main
-from app.db.models import UploadedImage, InferenceConversation, db
+from app.db.models import UploadedImage, Message, db
 from src.utils.inference import infer_image
 from src.llm.insights_engine import InsightsEngine
 
 UPLOADED_IMAGES_DIR = 'app/static/uploaded_images'
 
+# landing page
 @main.route('/', methods=['GET', 'POST'])
 def index():
-    # Initialize variables
-    uploaded_image = None
-    conversation = []
-
-    # Check for existing session
-    # if session.get('image_id'):
-    #     uploaded_image = UploadedImage.query.get(session['image_id'])
-    #     if uploaded_image:  # Add this check
-    #         conversation = InferenceConversation.query.filter_by(
-    #             image_id=uploaded_image.id
-    #         ).order_by(
-    #             InferenceConversation.timestamp
-    #         ).all()
-
     model = current_app.config['MODEL']
-    insights_engine = InsightsEngine()
+    device = current_app.config['DEVICE']
+
+    # clear session variables
+    session.clear()
 
     if request.method == 'POST':
-        # check if form includes an image
         if 'image' in request.files:
-            file = request.files['image']
+            image = request.files['image']
+            image_path = os.path.join(UPLOADED_IMAGES_DIR, image.filename)
+            image.save(image_path)
 
-            # check if file was selected
-            if file.filename == '':
-                flash('No selected file')
-                return redirect(request.url)
-            
-            if file:
-                try:
-                    # save uploaded file
-                    os.makedirs(UPLOADED_IMAGES_DIR, exist_ok=True)
-                    uploaded_image_path = os.path.join(UPLOADED_IMAGES_DIR, file.filename)
-                    file.save(uploaded_image_path)
-                    
-                    # perform image inference
-                    # image = Image.open(file)
-                    predicted_class, confidence = infer_image(
-                        uploaded_image_path,
-                        model,
-                        current_app.config['DEVICE']
-                    )
+            # run inference on image
+            predicted_class, confidence = infer_image(image_path, model, device) 
+            print(f"Image Path: {image_path}")
+            print(f"Predicted Class: {predicted_class}, Confidence: {confidence}")
 
-                    # save metadata and llm response to the database
-                    new_image = UploadedImage(
-                        filename=file.filename,
-                        file_path=uploaded_image_path,
-                        predicted_class=predicted_class,
-                        confidence=confidence
-                    )
-                    db.session.add(new_image)
-                    db.session.commit()
+            uploaded_image = UploadedImage(
+                filename=image.filename,
+                file_path=image_path,
+                predicted_class=predicted_class,
+                confidence=confidence
+            )
+            db.session.add(uploaded_image)
+            db.session.commit()
 
-                    # save image id to session
-                    session['image_id'] = str(new_image.id)
-                    uploaded_image = new_image
+            session['image_id'] = uploaded_image.id
 
-                    print(f"\nnew image id: {new_image.id}\n")
+            return redirect(url_for('main.chat'))
+        return redirect(url_for('main.index'))
+    
+    return render_template('index.html')
 
-                    # generating conversational insights with llm
-                    initial_insights = markdown(
-                        insights_engine.generate_insights(
-                            predicted_class, 
-                            confidence
-                        )
-                    )
+@main.route('/chat', methods=['GET', 'POST'])
+def chat():
 
-                    bot_message = InferenceConversation(
-                        image_id=session['image_id'],
-                        sender="PlantSense",
-                        message=initial_insights
-                    )
-                    db.session.add(bot_message)
-                    db.session.commit()
+    if 'image_id' not in session:
+        flash('No image uploaded. Please upload an image first.')
+        return redirect(url_for('main.index'))
 
-                    # get conversation for current image
-                    conversation = InferenceConversation.query.filter_by(
-                        image_id=session['image_id']
-                    ).order_by(
-                        InferenceConversation.timestamp
-                    ).all()
-                    
+    uploaded_image = UploadedImage.query.get(session['image_id'])
+    insights_engine = InsightsEngine()
 
-                except Exception as e:
-                    flash(f'An error occurred: {e}')
-                    return redirect(request.url)
-                
-        elif 'user_feedback' in request.form and session.get('image_id'):
-            uploaded_image = UploadedImage.query.get(session['image_id'])
-            if uploaded_image:  
-                # Handle user feedback for follow-up questions
-                user_feedback = request.form['user_feedback']
-                # Save the user's message to the conversation
-                user_message = InferenceConversation(
-                    image_id=session['image_id'],
-                    sender="User",
+    if uploaded_image:
+        session['image_path'] = uploaded_image.file_path
+
+        messages = Message.query.filter_by(image_id=uploaded_image.id).all()
+
+        # print(f"Uploaded Image: {uploaded_image.filename}")
+        # print(f"Uploaded Image Predicted Class: {uploaded_image.predicted_class}")
+        # print(f"Uploaded Image Confidence: {uploaded_image.confidence}")
+
+        if not messages:
+            # generate initial insights and store in db
+            initial_insights = markdown(
+                insights_engine.generate_insights(
+                    uploaded_image.predicted_class,
+                    uploaded_image.confidence
+                )
+            )
+
+            new_ps_message = Message(
+                image_id=uploaded_image.id,
+                sender='PlantSense',
+                message=initial_insights
+            )
+            db.session.add(new_ps_message)
+            db.session.commit()
+
+            # append initial message to messages list
+            messages = [new_ps_message]
+
+        if request.method == 'POST':
+            user_feedback = request.form['user_feedback']
+
+            if user_feedback:
+
+                new_user_message = Message(
+                    image_id=uploaded_image.id,
+                    sender='User',
                     message=user_feedback
                 )
-                db.session.add(user_message)
+                db.session.add(new_user_message)
                 db.session.commit()
 
-                # Generate a response based on the feedback
-                uploaded_image = UploadedImage.query.get(session['image_id'])
-                follow_up_response = insights_engine.generate_insights(
-                    uploaded_image.predicted_class,
-                    uploaded_image.confidence,
-                    user_feedback=user_feedback
+                # generate follow-up insights
+                follow_up_insights = markdown(
+                    insights_engine.generate_insights(
+                        uploaded_image.predicted_class,
+                        uploaded_image.confidence,
+                        user_feedback
+                    )
                 )
-                html_response = markdown(follow_up_response)
 
-                # Save the bot's response to the conversation
-                bot_response = InferenceConversation(
-                    image_id=session['image_id'],
-                    sender="Bot",
-                    message=html_response
+
+                new_ps_message = Message(
+                    image_id=uploaded_image.id,
+                    sender='PlantSense',
+                    message=follow_up_insights
                 )
-                db.session.add(bot_response)
+                db.session.add(new_ps_message)
                 db.session.commit()
 
-                conversation = InferenceConversation.query.filter_by(
-                    image_id=session['image_id']
-                ).order_by(
-                    InferenceConversation.timestamp
-                ).all()
+                return redirect(url_for('main.chat'))
 
-    return render_template(
-        'index.html',
-        # predicted_class=predicted_class,
-        # confidence=confidence,
-        uploaded_image_path=uploaded_image.file_path if uploaded_image else None,
-        conversation=conversation
-    )
+            # append follow-up message to messages list
+            messages = Message.query.filter_by(image_id=uploaded_image.id).all()
 
-
-
-
-
-
+    return render_template('chat.html', uploaded_image=uploaded_image, messages=messages)
 

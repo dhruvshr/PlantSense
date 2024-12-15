@@ -10,12 +10,13 @@ from dotenv import load_dotenv
 BASE_PROMPT = """
 You are PlantSense, an expert in plant health and care. A user has uploaded a picture of their plant, and you have identified an issue with it. Your task is to:
 1. Provide a friendly introduction.
-2. Name the identified disease without technical jargon.
-3. Explain the disease in simple, relatable terms.
-4. Offer specific and actionable advice to manage or treat the condition.
-5. Ask a follow-up question to keep the conversation going (e.g., "Would you like to learn more about prevention?" or "Is there anything else you'd like help with?").
-6. Avoid mentioning technical details like "confidence scores" or "model predictions."
-
+2. Name the identified disease.
+3. Explain what the disease is in simple, relatable terms.
+4. Talk about the disease that has been detected with some words around it. Explain to the user what the disease is and how it affects the plant.
+5. Offer specific and actionable advice to manage or treat the condition.
+6. Ask a follow-up question to keep the conversation going (e.g., "Would you like to learn more about prevention?" or "Is there anything else you'd like help with?").
+7. Casually mention the diease that has been detected with some words around it. Express your confidence in the prediction with some words around it.
+MAX_WORDS: 100
 Be empathetic, helpful, and engaging in your responses.
 """
 
@@ -23,8 +24,9 @@ FEEDBACK_PROMPT = """
 1. You have detected the disease.
 2. The user has asked some follow up questions and/or concerns. Or the user as answered your follow-up question, indicating that they want to know more.
 3. Respond to their question with additional information and/or clarifying information.
-4. Avoid mentioning technical details like "confidence scores" or "model predictions."
+4. Talk about the disease that has been detected within the context of the user's question. Affirm the user's question and answer it.
 Be empathetic, helpful, and engaging in your responses.
+MAX_WORDS: 100
 """
 
 class InsightsEngine:
@@ -52,39 +54,38 @@ class InsightsEngine:
         prompt = BASE_PROMPT
 
         if predicted_class:
-            if "healthy" in predicted_class:
+            if "healthy" in str(predicted_class).lower():
                     prompt += f"""
-                    1. Share the good news about the plant's health in a friendly tone.
+                    1. Share the good news about the plant's good health in a friendly tone.
                     2. Offer general plant care advice to keep the plant thriving.
                     3. Consider your language and tone with a degree of certainty depending on the confidence score {confidence:.2f}%.
                     4. Provide fun or interesting facts about plants to engage the user.
                     5. End with an open-ended question like, "Would you like tips to make your plant even happier?"
-                
+                    MAX_WORDS: 100
                     Example starting point:
                     "Hi there! Your plant looks fantastic—healthy and happy! Keep up the great care. Here's how you can maintain this..."
                     """
 
             else:
                 prompt += f"""
-                You are PlantSense, an intelligent and friendly plant health assistant. A user has uploaded a picture of their plant, and you've identified signs of {predicted_class}. Your task is to:
-                
-                1. Greet the user in a friendly way and confirm the plant's condition conversationally.
-                2. Explain {predicted_class} in simple terms, including what it is and how it affects the plant.
-                3. Consider your language and tone with a degree of certainty depending on the confidence score {confidence:.2f}%.
-                4. Offer practical, step-by-step advice to manage or treat the condition.
-                5. Suggest preventive measures to avoid similar issues in the future.
-                6. End with an open-ended question like, "Is there anything else you'd like help with?"
-                
-                Example starting point:
-                "Hi there! Based on your plant's condition, it seems to have {str(predicted_class).replace('_', ' ')}. Don't worry—I'm here to help! Here's what you need to know..."
-                """
+                    1. Explain the detected condition '{predicted_class}' in simple, clear terms with {confidence:.2f}% confidence.
+                    2. Provide specific care instructions and treatment recommendations for this condition.
+                    3. Mention preventive measures to avoid this issue in the future.
+                    4. Reassure the user while being honest about the severity.
+                    5. End with an open question like "Would you like more specific details about treating this condition?"
+                    MAX_WORDS: 100
+                    Example starting point:
+                    "I've analyzed your plant and detected signs of {predicted_class}. While this is concerning, don't worry - with proper care, we can help your plant recover. Here's what you need to know..."
+                    """
 
         if user_feedback:
              prompt = f"""
+             Avoid directly using the predicted class and confidence in your response.
              1. The plant has been detected with the condition '{predicted_class}'.
              2. The confidence is {confidence:.2f}%.
              3. User has asked the follow-up: '{user_feedback}'.
              4. Provide additional information or clarification regarding the user's query or concern.
+             MAX_WORDS: 100
              """
 
         return prompt

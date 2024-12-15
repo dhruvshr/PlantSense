@@ -1,14 +1,11 @@
 """
 Flask Initialization
 """
-import os
+
 from dotenv import load_dotenv
 from flask import Flask
 from flask_migrate import Migrate
-from torch.serialization import add_safe_globals
 from app.main.config import Config
-from src.model.plantsense_resnet import PlantSenseResNetBase
-from src.datasets.plant_village import PlantVillage
 from src.utils.device import get_device
 
 from src.utils.model_loader import load_model
