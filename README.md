@@ -19,12 +19,6 @@ PlantSense is an AI-powered plant disease detection and diagnosis system that de
     - Receive customized care instructions
     - Learn about prevention methods
 
-4. Accessibility: The system is designed to be:
-
-    - Easy to use for non-experts
-    - Free from technical jargon
-    - Multilingual (planned feature)
-
 ## Features
 
 - **Real-time Plant Disease Detection**: Upload images of your plants for instant disease detection
