@@ -15,11 +15,11 @@ def infer_image(image_path, model, device):
     # perform inference
     with torch.no_grad():
         output = model(image_tensor)
-        # Apply softmax to get probabilities
+        # softmax to get probabilities
         probabilities = torch.nn.functional.softmax(output, dim=1)
         confidence, predicted_idx = torch.max(probabilities, 1)
         predicted_class = base_dataset.plantvillage.classes[predicted_idx]
-        # Convert confidence to percentage
+        # convert confidence to percentage
         confidence_score = confidence.item() * 100
 
     return predicted_class, confidence_score

@@ -1,7 +1,9 @@
+"""
+Model evaluation 
+"""
+
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader
-import torchvision.transforms as transforms
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -17,7 +19,7 @@ from src.utils.metrics import MetricsTracker
 class ModelEvaluator:
     def __init__(self, model, device, test_loader, class_names):
         """
-        Comprehensive model evaluation utility
+        Initialize the ModelEvaluator class
         
         Args:
             model (nn.Module): Trained PyTorch model
@@ -32,8 +34,6 @@ class ModelEvaluator:
 
         self.all_labels = []
         self.all_preds = []
-        self.metrics = MetricsTracker(self.model)
-
 
     def compute_metrics(self):
         """

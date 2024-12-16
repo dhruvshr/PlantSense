@@ -12,14 +12,13 @@ import matplotlib.pyplot as plt
 from src.utils.device import get_device
 from src.datasets.plant_village import PlantVillage
 from src.evaluation.evaluator import ModelEvaluator
-from src.model.atomic_resnet import ResNet
+from src.model.base_resnet import ResNet
 from src.utils.metrics import MetricsTracker
 
 # define model path
 MODEL_PATH = "saved_models/checkpoints/resnet_model_best_2.pth"
 
 matplotlib.use('Agg')
-
 
 def main():
     # Device configuration
@@ -74,15 +73,12 @@ def main():
     
     # top-k accuracy
     top_3_accuracy = evaluator.top_k_accuracy(k=3)
-    print(f"\nTop-3 Accuracy: {top_3_accuracy:.2f}%")
+    print(f"Top-3 Accuracy: {top_3_accuracy:.2f}%")
     
     # visualize confusion matrix
     cm_fig = evaluator.plot_confusion_matrix(normalize=True)
     cm_fig.savefig('results/confusion_matrix.png')
     plt.close(cm_fig)
-
-    # update metrics
-    # evaluator.metrics.plot_metrics(model=model, save_path='results/metrics.png')
 
 if __name__ == '__main__':
     main()

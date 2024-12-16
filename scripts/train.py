@@ -1,7 +1,7 @@
 """
 ML Model Train script
 """
-import os
+
 import torch.nn as nn
 import torch.optim as optim
 
@@ -10,153 +10,58 @@ from torch.utils.data import DataLoader
 from dotenv import load_dotenv
 
 from src.utils.device import get_device
-from src.utils.save_model import save_trained_model
 from src.datasets.plant_village import PlantVillage
 from src.training.trainer import ModelTrainer
-from src.model.plantsense_resnet import PlantSenseResNetBase
-from src.model.atomic_resnet import ResNet
-from src.utils.save_model import save_checkpoint, save_model
+from src.model.base_resnet import ResNet
 from src.utils.transforms import optimized_transform
 
 load_dotenv()
 
-# def
+# training parameters
 BATCH_SIZE = 32
-NUM_WORKERS = 2
+NUM_WORKERS = 4
 LEARNING_RATE = 0.001
 NUM_EPOCHS = 10
-CHECKPOINTS_SAVE_DIR = 'saved_models/checkpoints'
-MODEL_SAVE_DIR = 'saved_models'
-VERSION = 1_2
 
 def train():
-    # device configuration
-    device = get_device()
-
-    # load dataset
-    base_dataset = PlantVillage()
-
-    # split dataset
-    train_data, val_data, test_data = base_dataset.split_dataset()
-
-    # create dataloaders
-    train_loader = DataLoader(
-        train_data,
-        batch_size = BATCH_SIZE,
-        shuffle=True,
-        num_workers=NUM_WORKERS
-    )
-
-    val_loader = DataLoader(
-        val_data,
-        batch_size = BATCH_SIZE,
-        shuffle=False,
-        num_workers=NUM_WORKERS
-    )
-
-    test_loader = DataLoader(
-        test_data,
-        batch_size = BATCH_SIZE,
-        shuffle=False,
-        num_workers=NUM_WORKERS
-    )
-
-    # init model
-    model = PlantSenseResNetBase(
-        num_classes=base_dataset.NUM_CLASSES,
-    ).to(device)
-
-    # setup training components
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr = LEARNING_RATE)
-
-    # create trainer
-    trainer = ModelTrainer(
-        model = model,
-        device = device,
-        criterion = criterion,
-        optimizer = optimizer
-    )
-
-    print(f"Training {model.__class__.__name__} on {device}\n")
-
-    accuracies = list()
-
-    # training loop
-    num_epochs = NUM_EPOCHS
-    for epoch in range(num_epochs):
-        train_metrics = trainer.train_epoch(train_loader, epoch, num_epochs)
-        val_metrics = trainer.validate(val_loader, epoch, num_epochs)
-
-        print(f"Epoch {epoch+1}/{num_epochs}")
-        print(f"Train Loss: {train_metrics['loss']:.4f}, Accuracy: {train_metrics['accuracy']:.2f}%")
-        print(f"Val Loss: {val_metrics['loss']:.4f}, Accuracy: {val_metrics['accuracy']:.2f}%")
-
-        checkpoint_save = input("Save Checkpoint?: y or n: ")
-
-        if (checkpoint_save.strip() == 'y'):
-            save_checkpoint(
-                model, 
-                optimizer, 
-                CHECKPOINTS_SAVE_DIR, 
-                model.__class__.__name__, 
-                VERSION, 
-                epoch=epoch
-            )
-            pass
-        elif (checkpoint_save.strip() == 'n'):
-            pass
-
-    # save model
-    model_save = input("Save Model?: y or n: ")
-
-    if (model_save.strip() == 'y'):
-        save_model(
-            model, 
-            MODEL_SAVE_DIR, 
-            model.__class__.__name__, 
-            VERSION
-        )
-        pass
-    elif (model_save.strip() == 'n'):
-        pass
-
-
-def main():
     # Device configuration
     device = get_device()
     
     # Dataset with optimized transforms
     train_transform = optimized_transform(is_training=True)
-    val_transform = optimized_transform(is_training=False)
-    
+
     # Load dataset
     train_dataset = PlantVillage(transform=train_transform)
     train_data, val_data, test_data = train_dataset.split_dataset()
     
-    # Create data loaders
+    # create data loaders
     train_loader = DataLoader(
         train_data,
-        batch_size=32,
+        batch_size=BATCH_SIZE,
         shuffle=True,
-        num_workers=4,
+        num_workers=NUM_WORKERS,
         pin_memory=True
     )
     
     val_loader = DataLoader(
         val_data,
-        batch_size=32,
+        batch_size=BATCH_SIZE,
         shuffle=False,
-        num_workers=4,
+        num_workers=NUM_WORKERS,
         pin_memory=True
     )
     
-    # Initialize model
-    model = ResNet(num_classes=train_dataset.NUM_CLASSES).to(device)
+    # init model
+    model = ResNet(
+        num_classes=train_dataset.NUM_CLASSES
+    ).to(device)
 
     # setup training components
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr = LEARNING_RATE)
+    optimizer = optim.Adam(
+        model.parameters(),
+        lr = LEARNING_RATE
+    )
 
     # create trainer
     trainer = ModelTrainer(
@@ -167,9 +72,28 @@ def main():
     )
     
     # train model
-    trained_model = trainer.train_model(model, train_loader, val_loader, device)
+    trained_model = trainer.train_model(
+        model,
+        train_loader,
+        val_loader,
+        device
+    )
+
+    print("\nTraining Metrics:")
+    # show metrics
+    metrics = trainer.metrics.get_metrics()
+    for epoch in range(len(metrics['epochs'])):
+        print(f"Epoch {metrics['epochs'][epoch]}")
+        print(f"Train Loss: {metrics['train_loss'][epoch]:.4f}", end=' | ')
+        print(f"Train Accuracy: {metrics['train_acc'][epoch]:.2f}%", end=' | ')
+        print(f"Val Loss: {metrics['val_loss'][epoch]:.4f}", end=' | ')
+        print(f"Val Accuracy: {metrics['val_acc'][epoch]:.2f}%")
+
+    # plot all metrics
+    trainer.metrics.plot_metrics(save_path='results/metrics.png')
+
 if __name__ == '__main__':
-    main()
+    train()
     
     
 
