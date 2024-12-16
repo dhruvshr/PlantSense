@@ -54,8 +54,29 @@ class InsightsEngine:
         prompt = ''
 
         if predicted_class:
-            if "healthy" in str(predicted_class).lower():
+            if "background" in str(predicted_class).lower():
+                if confidence > 0.8:  # high confidence that there's no plant
                     prompt += f"""
+                        1. Politely inform the user that no plant or leaves were detected in the image with {confidence:.2f}% confidence. But don't explicitly mention the confidence score.
+                        2. Ask them to ensure their plant is clearly visible in the frame.
+                        3. Provide tips for taking better plant photos (good lighting, clear view of leaves, minimal background clutter).
+                        4. Encourage them to try again with a new photo.
+                        5. End with a supportive message like "I'm here to help once you have a clear photo of your plant!"
+                        Example starting point:
+                        "I don't seem to detect any plants or leaves in this image. This could mean the plant is out of frame or the image might need to be clearer..."
+                        """
+                else:  # lower confidence might indicate a misclassification
+                    prompt += f"""
+                        1. Acknowledge potential uncertainty in the analysis with {confidence:.2f}% confidence. But don't explicitly mention the confidence score.
+                        2. Mention that while the system is having trouble detecting the plant clearly, you'd be happy to try again.
+                        3. Provide tips for getting a better analysis (different angle, better lighting, closer shot of leaves).
+                        4. If they confirm there is a plant in the image, apologize for the misclassification.
+                        5. End with an encouraging message to try again with a different photo.
+                        Example starting point:
+                        "I'm having a bit of trouble getting a clear read on your plant in this image. While I see something that might be a plant..."
+                        """
+            elif "healthy" in str(predicted_class).lower():
+                prompt += f"""
                     1. Share the good news about the plant's good health in a friendly tone.
                     2. Offer general plant care advice to keep the plant thriving.
                     3. Consider your language and tone with a degree of certainty depending on the confidence score {confidence:.2f}%.
