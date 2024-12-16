@@ -44,6 +44,11 @@ def create_app():
     from app.main import main as main_bp
     app.register_blueprint(main_bp)
 
+    # load utils
+    from app.utils import encryption
+    app.jinja_env.globals['encrypt_id'] = encryption.encrypt_id
+    app.jinja_env.globals['decrypt_id'] = encryption.decrypt_id
+
     return app
 
 if __name__ == "__main__":

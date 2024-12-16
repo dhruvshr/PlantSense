@@ -236,7 +236,7 @@
 <div class="image-grid">
     {% for image in previous_images %}
     <div class="grid-item">
-        <a href="{{ url_for('main.chat', image_id=image.id) }}">
+        <a href="{{ url_for('main.chat', encrypted_image_id=encrypt_id(image.id)) }}">
             <img src="{{ url_for('static', filename='uploaded_images/' + image.file_path.split('/')[-1]) }}" 
                  alt="Previous upload">
             <div class="image-info">

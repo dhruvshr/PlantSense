@@ -10,6 +10,8 @@ from app.main import main
 from app.db.models import UploadedImage, Message, db
 from src.utils.inference import infer_image
 from src.llm.insights_engine import InsightsEngine
+from app.utils.encryption import encrypt_id, decrypt_id
+
 
 UPLOADED_IMAGES_DIR = 'app/static/uploaded_images'
 
@@ -46,27 +48,32 @@ def index():
             db.session.commit()
 
             session['image_id'] = uploaded_image.id
+            encrypted_image_id = encrypt_id(uploaded_image.id)
 
-            return redirect(url_for('main.chat', image_id=uploaded_image.id))
+            # redirect to chat page with encrypted image id
+            return redirect(url_for('main.chat', encrypted_image_id=encrypted_image_id))
         
         elif 'image_id' in request.args:
             # Set the image_id in session when clicking a previous image
             image_id = request.args.get('image_id')
             session['image_id'] = int(image_id)
-            return redirect(url_for('main.chat', image_id=image_id))
+            encrypted_image_id = encrypt_id(image_id)
+            return redirect(url_for('main.chat', encrypted_image_id=encrypted_image_id))
 
         return redirect(url_for('main.index'))
     
     return render_template('index.html', previous_images=previous_images)
 
-@main.route('/chat/<int:image_id>', methods=['GET', 'POST'])
-def chat(image_id):
+@main.route('/chat/<string:encrypted_image_id>', methods=['GET', 'POST'])
+def chat(encrypted_image_id):
+    image_id = decrypt_id(encrypted_image_id)
     uploaded_image = UploadedImage.query.get_or_404(image_id)
     insights_engine = InsightsEngine()
 
     if uploaded_image:
         session['image_path'] = uploaded_image.file_path
         session['image_id'] = image_id
+        encrypted_image_id = encrypt_id(image_id)
 
         # Get all messages for this image
         messages = uploaded_image.messages
@@ -120,7 +127,7 @@ def chat(image_id):
                 db.session.add(new_ps_message)
                 db.session.commit()
 
-                return redirect(url_for('main.chat', image_id=image_id))
+                return redirect(url_for('main.chat', encrypted_image_id=encrypted_image_id))
 
     # Get previous images for the grid
     previous_images = UploadedImage.query.order_by(UploadedImage.uploaded_at.desc()).all()
