@@ -110,6 +110,54 @@
         border-color: #45a049;
         box-shadow: 0 0 5px #4CAF50;
     }
+
+    .image-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 20px;
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .grid-item {
+        position: relative;
+        aspect-ratio: 1;
+        overflow: hidden;
+        border-radius: 8px;
+        border: 1px solid #4CAF50;
+    }
+
+    .grid-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .grid-item .image-info {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    .grid-item a {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+
+    .grid-item:hover {
+        transform: scale(1.02);
+        transition: transform 0.2s ease-in-out;
+        box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
+    }
+
 </style>
 {% endblock %}
 
@@ -162,7 +210,7 @@
 </body>
 
 <script>
-    // Function to scroll chat log to bottom
+    // function to scroll chat log to bottom
     function scrollToBottom() {
         const chatLog = document.querySelector('.chat-log');
         if (chatLog) {
@@ -170,10 +218,10 @@
         }
     }
 
-    // Scroll when page loads
+    // scroll when page loads
     document.addEventListener('DOMContentLoaded', scrollToBottom);
 
-    // Scroll when new messages are added
+    // scroll when new messages are added
     const observer = new MutationObserver(scrollToBottom);
     const chatLog = document.querySelector('.chat-log');
     if (chatLog) {
@@ -183,5 +231,23 @@
         });
     }
 </script>
+
+{% if previous_images %}
+<div class="image-grid">
+    {% for image in previous_images %}
+    <div class="grid-item">
+        <a href="{{ url_for('main.chat', image_id=image.id) }}">
+            <img src="{{ url_for('static', filename='uploaded_images/' + image.file_path.split('/')[-1]) }}" 
+                 alt="Previous upload">
+            <div class="image-info">
+                <div>{{ image.file_path.split('/')[-1] }}</div>
+                <div>{{ image.predicted_class }}</div>
+                <div>{{ image.uploaded_at.strftime('%Y-%m-%d') }}</div>
+            </div>
+        </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
 {% endblock %}

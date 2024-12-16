@@ -19,6 +19,9 @@ def index():
     model = current_app.config['MODEL']
     device = current_app.config['DEVICE']
 
+    # Get previous images with their messages
+    previous_images = UploadedImage.query.order_by(UploadedImage.uploaded_at.desc()).all()
+
     # clear session variables
     session.clear()
 
@@ -44,29 +47,29 @@ def index():
 
             session['image_id'] = uploaded_image.id
 
-            return redirect(url_for('main.chat'))
+            return redirect(url_for('main.chat', image_id=uploaded_image.id))
+        
+        elif 'image_id' in request.args:
+            # Set the image_id in session when clicking a previous image
+            image_id = request.args.get('image_id')
+            session['image_id'] = int(image_id)
+            return redirect(url_for('main.chat', image_id=image_id))
+
         return redirect(url_for('main.index'))
     
-    return render_template('index.html')
+    return render_template('index.html', previous_images=previous_images)
 
-@main.route('/chat', methods=['GET', 'POST'])
-def chat():
-
-    if 'image_id' not in session:
-        flash('No image uploaded. Please upload an image first.')
-        return redirect(url_for('main.index'))
-
-    uploaded_image = UploadedImage.query.get(session['image_id'])
+@main.route('/chat/<int:image_id>', methods=['GET', 'POST'])
+def chat(image_id):
+    uploaded_image = UploadedImage.query.get_or_404(image_id)
     insights_engine = InsightsEngine()
 
     if uploaded_image:
         session['image_path'] = uploaded_image.file_path
+        session['image_id'] = image_id
 
-        messages = Message.query.filter_by(image_id=uploaded_image.id).all()
-
-        # print(f"Uploaded Image: {uploaded_image.filename}")
-        # print(f"Uploaded Image Predicted Class: {uploaded_image.predicted_class}")
-        # print(f"Uploaded Image Confidence: {uploaded_image.confidence}")
+        # Get all messages for this image
+        messages = uploaded_image.messages
 
         if not messages:
             # generate initial insights and store in db
@@ -92,7 +95,6 @@ def chat():
             user_feedback = request.form['user_feedback']
 
             if user_feedback:
-
                 new_user_message = Message(
                     image_id=uploaded_image.id,
                     sender='User',
@@ -110,7 +112,6 @@ def chat():
                     )
                 )
 
-
                 new_ps_message = Message(
                     image_id=uploaded_image.id,
                     sender='PlantSense',
@@ -119,10 +120,14 @@ def chat():
                 db.session.add(new_ps_message)
                 db.session.commit()
 
-                return redirect(url_for('main.chat'))
+                return redirect(url_for('main.chat', image_id=image_id))
 
-            # append follow-up message to messages list
-            messages = Message.query.filter_by(image_id=uploaded_image.id).all()
-
-    return render_template('chat.html', uploaded_image=uploaded_image, messages=messages)
+    # Get previous images for the grid
+    previous_images = UploadedImage.query.order_by(UploadedImage.uploaded_at.desc()).all()
+    return render_template(
+        'chat.html', 
+        uploaded_image=uploaded_image, 
+        messages=messages, 
+        previous_images=previous_images
+    )
 
