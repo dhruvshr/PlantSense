@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='assets/plantsense-logo.png') }}">
+    <title>{% block title %}{% endblock %}</title>
+    {% block head %}{% endblock %}
+
+    <style>
+        .container {
+            margin: 50px auto;
+            max-width: 600px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+    {% block content %}
+    {% endblock %}
+</html>
