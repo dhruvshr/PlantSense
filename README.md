@@ -157,6 +157,9 @@ git checkout -b feature/your-feature-name
 ## Acknowledgments
 
 - Plant Village Dataset for training data
+
+    - Dataset Link: 'https://data.mendeley.com/datasets/tywbtsjrjv/1'
+
 - OpenAI for chat capabilities
 - PyTorch team for the deep learning framework
 - Flask team for the web framework
