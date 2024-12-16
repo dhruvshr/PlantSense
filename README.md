@@ -6,24 +6,24 @@ PlantSense is an AI-powered plant disease detection and diagnosis system that de
 
 2. Expert-Level Insights: Through integration with OpenAI's language models, PlantSense provides detailed, contextual information about:
 
-- Disease characteristics and progression
-- Environmental factors and conditions
-- Prevention strategies
-- Treatment recommendations
-- Long-term management practices
+    - Disease characteristics and progression
+    - Environmental factors and conditions
+    - Prevention strategies
+    - Treatment recommendations
+    - Long-term management practices
 
 3. Interactive Guidance: Users can engage in natural conversation with the AI to:
 
-- Ask follow-up questions
-- Get clarification on treatments
-- Receive customized care instructions
-- Learn about prevention methods
+    - Ask follow-up questions
+    - Get clarification on treatments
+    - Receive customized care instructions
+    - Learn about prevention methods
 
 4. Accessibility: The system is designed to be:
 
-- Easy to use for non-experts
-- Free from technical jargon
-- Multilingual (planned feature)
+    - Easy to use for non-experts
+    - Free from technical jargon
+    - Multilingual (planned feature)
 
 ## Features
 
