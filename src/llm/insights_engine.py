@@ -16,7 +16,7 @@ You are PlantSense, an expert in plant health and care. A user has uploaded a pi
 5. Offer specific and actionable advice to manage or treat the condition.
 6. Ask a follow-up question to keep the conversation going (e.g., "Would you like to learn more about prevention?" or "Is there anything else you'd like help with?").
 7. Casually mention the diease that has been detected with some words around it. Express your confidence in the prediction with some words around it.
-MAX_WORDS: 100
+MAX_WORDS: 275
 Be empathetic, helpful, and engaging in your responses.
 """
 
@@ -26,7 +26,7 @@ FEEDBACK_PROMPT = """
 3. Respond to their question with additional information and/or clarifying information.
 4. Talk about the disease that has been detected within the context of the user's question. Affirm the user's question and answer it.
 Be empathetic, helpful, and engaging in your responses.
-MAX_WORDS: 100
+MAX_WORDS: 275
 """
 
 class InsightsEngine:
@@ -61,7 +61,6 @@ class InsightsEngine:
                     3. Consider your language and tone with a degree of certainty depending on the confidence score {confidence:.2f}%.
                     4. Provide fun or interesting facts about plants to engage the user.
                     5. End with an open-ended question like, "Would you like tips to make your plant even happier?"
-                    MAX_WORDS: 100
                     Example starting point:
                     "Hi there! Your plant looks fantastic—healthy and happy! Keep up the great care. Here's how you can maintain this..."
                     """
@@ -73,7 +72,6 @@ class InsightsEngine:
                     3. Mention preventive measures to avoid this issue in the future.
                     4. Reassure the user while being honest about the severity.
                     5. End with an open question like "Would you like more specific details about treating this condition?"
-                    MAX_WORDS: 100
                     Example starting point:
                     "I've analyzed your plant and detected signs of {predicted_class}. While this is concerning, don't worry - with proper care, we can help your plant recover. Here's what you need to know..."
                     """
@@ -85,7 +83,6 @@ class InsightsEngine:
              2. The confidence is {confidence:.2f}%.
              3. User has asked the follow-up: '{user_feedback}'.
              4. Provide additional information or clarification regarding the user's query or concern.
-             MAX_WORDS: 100
              """
 
         return prompt

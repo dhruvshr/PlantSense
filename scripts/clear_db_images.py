@@ -1,3 +1,7 @@
+"""
+This script clears the database and the uploaded images directory.
+"""
+
 from app import create_app
 from app.db.models import db, UploadedImage, Message
 import os
