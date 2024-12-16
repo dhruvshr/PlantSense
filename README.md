@@ -53,6 +53,8 @@ PlantSense is an AI-powered plant disease detection and diagnosis system that de
 
 1. Clone the repository:
 
+*As the repository is private, you need to have access to the repository from the owner or a collaborator.
+
 ```bash
 git clone https://github.com/yourusername/plantsense.git
 cd plantsense
