@@ -134,33 +134,3 @@ class InsightsEngine:
             
         except Exception as e:
             return f"Error generating insights: {str(e)}"
-    
-    # def _construct_prompt(self, predictions: List[Dict], image_paths: List[str]) -> str:
-    #     """
-    #     Construct a prompt for the LLM based on predictions
-        
-    #     Args:
-    #         predictions (List[Dict]): List of prediction dictionaries
-    #         image_paths (List[str]): List of image paths
-            
-    #     Returns:
-    #         str: Constructed prompt
-    #     """
-    #     prompt = generate_prompt(predictions, confidence)
-        
-    #     for i, (pred, img_path) in enumerate(zip(predictions, image_paths)):
-    #         prompt += f"Image {i+1} ({os.path.basename(img_path)}):\n"
-    #         prompt += f"- Predicted class: {pred['class']}\n"
-    #         prompt += f"- Confidence: {pred['confidence']:.2f}%\n\n"
-            
-    #     prompt += """
-    #     Please provide insights about these findings in a conversational way. Include:
-    #     1. A summary of the plant health status
-    #     2. Potential concerns or issues identified
-    #     3. Recommended actions or treatments if problems are detected
-    #     4. General advice for plant care
-
-    #     Please keep the response informative but friendly and easy to understand.
-    #     """
-        
-    #     return prompt
