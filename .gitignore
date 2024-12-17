@@ -34,3 +34,6 @@ instance/
 
 # user uploaded images
 app/static/uploaded_images/
+
+# ruf notebooks
+notebooks/ruf.md
