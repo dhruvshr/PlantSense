@@ -51,7 +51,7 @@ def main():
 
     model = ResNet(num_classes=PlantVillage().NUM_CLASSES).to(device)
 
-    model.load_state_dict(torch.load(MODEL_PATH, weights_only=True))
+    model.load_state_dict(torch.load(MODEL_PATH, weights_only=True, map_location=device))
 
     model.eval()
 

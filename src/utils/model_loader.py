@@ -18,7 +18,7 @@ def load_model(device=None):
     ).to(device)
 
     # load the state dict and modify the keys to match model structure
-    state_dict = torch.load(MODEL_PATH, weights_only=True)
+    state_dict = torch.load(MODEL_PATH, weights_only=True, map_location=device)
     
     # load the modified state dict
     model.load_state_dict(state_dict)
