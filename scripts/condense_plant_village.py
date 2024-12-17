@@ -2,6 +2,8 @@ import os
 import random
 import shutil
 
+# ONLY FOR CODE DELIVERY AND SUBMISSION TO CANVAS
+
 def delete_percentage_of_images(dataset_path, target_class, percentage_to_delete=0.6):
     """
     Delete a specified percentage of images from a specific class in the dataset.
