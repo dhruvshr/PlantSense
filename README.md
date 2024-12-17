@@ -53,46 +53,46 @@ PlantSense is an AI-powered plant disease detection and diagnosis system that de
 
 1. Clone the repository:
 
-*As the repository is private, you need to have access to the repository from the owner or a collaborator.
+    - As the repository is private, you need to have access to the repository from the owner or a collaborator.
 
-```bash
-git clone https://github.com/yourusername/plantsense.git
-cd plantsense
-```
+    ```bash
+    git clone https://github.com/yourusername/plantsense.git
+    cd plantsense
+    ```
 
 2. Create and activate a virtual environment:
 
-```bash
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-```
+    ```bash
+    python -m venv .venv
+    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+    ```
 
 3. Install dependencies:
 
-```bash
-pip install -r requirements.txt
-```
+    ```bash
+    pip install -r requirements.txt
+    ```
 
 4. Set up environment variables:
 
-```bash
-cp .env.example .env
-# Edit .env with your configurations
-```
+    ```bash
+    cp .env.example .env
+    # Edit .env with your configurations
+    ```
 
 5. Initialize the database:
 
-```bash
-flask db upgrade
-```
+    ```bash
+    flask db upgrade
+    ```
 
 ## Usage
 
 1. Start the Flask development server:
 
-```bash
-python run.py
-```
+    ```bash
+    python run.py
+    ```
 
 2. Open your browser and navigate to `http://localhost:5000`
 
@@ -107,9 +107,9 @@ The project uses a custom-trained ResNet18 model for plant disease detection. To
 1. Download the Plant Village dataset
 2. Run the training script:
 
-```bash
-python scripts/train.py
-```
+    ```bash
+    python scripts/train.py
+    ```
 
 Training configurations can be modified in `src/training/trainer.py`.
 
@@ -126,12 +126,12 @@ flask db upgrade
 
 1. Create a new branch:
 
-```bash
-git checkout -b feature/your-feature-name
-```
+    ```bash
+    git checkout -b feature/your-feature-name
+    ```
 
 2. Make your changes
-3. Run tests
+3. Run tests (if applicable)
 4. Submit a pull request
 
 ## API Reference
