@@ -26,8 +26,9 @@ saved_models/
 # file structure
 file_structure.md
 
-# python db
+# python database (db) files
 instance/
+*.db
 
 # user uploaded images
 app/static/uploaded_images/
