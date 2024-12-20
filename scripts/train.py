@@ -70,6 +70,8 @@ def train():
         criterion = criterion,
         optimizer = optimizer
     )
+
+    print(f"Training {model.__class__.__name__} on {device}...")
     
     # train model
     trained_model = trainer.train_model(

@@ -43,7 +43,7 @@ class PlantVillage(Dataset):
         
         return image, label
     
-    def split_dataset(self, train_ratio=0.7, val_ratio=0.15):
+    def split_dataset(self, train_ratio=0.6, val_ratio=0.2):
         """
         Split dataset into train, validation, and test sets
         
